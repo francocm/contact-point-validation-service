@@ -1,0 +1,78 @@
+openapi: "3.0.1"
+info:
+  version: 1.0.0
+  title: Contact Point Validation API
+  license:
+    name: MIT
+paths:
+  /reference/{ref}:
+    get:
+      summary: Get a reference code.
+      operationId: getReferenceCode
+      tags:
+        - Validation
+      parameters:
+        - name: ref
+          in: path
+          description: Public reference / validation code.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Matched reference code meta-data.
+          headers:
+            x-uuid:
+              description: A UUID of the request matching internal application logs useful for audit or debugging reasons.
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/ReferenceCode"
+        '404':
+          description: Reference code unknown or expired.
+          headers:
+            x-uuid:
+              description: A UUID of the request matching internal application logs useful for audit or debugging reasons.
+              schema:
+                type: string
+                format: uuid
+        '500':
+          description: Internal Server Error
+          headers:
+            x-uuid:
+              description: A UUID of the request matching internal application logs useful for audit or debugging reasons.
+              schema:
+                type: string
+                format: uuid
+components:
+  schemas:
+    ReferenceCode:
+      required:
+        - code
+        - createdOn
+        - firstValidatedOn
+        - validationCount
+        - expireOn
+      properties:
+        code:
+          type: string
+          description: The actual reference code.
+        createdOn:
+          type: string
+          format: date-time
+          description: Timestamp when reference code was created.
+        firstValidatedOn:
+          type: string
+          format: date-time
+          description: Timestamp when reference code was first validated on.
+        validationCount:
+          type: integer
+          format: int32
+          description: Count of times reference code was validated.
+        expireOn:
+          type: string
+          format: date-time
+          description: Timestamp after which reference code will expire and gets deleted.

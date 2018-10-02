@@ -1,0 +1,440 @@
+openapi: "3.0.1"
+info:
+  version: 1.0.0
+  title: Contact Point Admin API
+  license:
+    name: MIT
+paths:
+  /reference/{ref}:
+    get:
+      summary: Get reference code by internal reference.
+      operationId: getReferenceCodeByInternalRef
+      tags:
+        - Reference Management
+      parameters:
+        - name: ref
+          in: path
+          description: Internal Reference code.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Reference code.
+          headers:
+            x-uuid:
+              description: A UUID of the request matching internal application logs useful for audit or debugging reasons.
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/ReferenceCodeResponse"
+        '404':
+          description: Reference code unknown / not found.
+          headers:
+            x-uuid:
+              description: A UUID of the request matching internal application logs useful for audit or debugging reasons.
+              schema:
+                type: string
+                format: uuid
+        '500':
+          description: Internal Server Error
+          headers:
+            x-uuid:
+              description: A UUID of the request matching internal application logs useful for audit or debugging reasons.
+              schema:
+                type: string
+                format: uuid
+  /reference:
+    get:
+      summary: Get all reference codes, with optional filtering.
+      operationId: getAllReferenceCodes
+      tags:
+        - Reference Management
+      parameters:
+        - name: applicationId
+          in: query
+          description: Application ID of which to get reference codes.
+          required: false
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: Reference code.
+          headers:
+            x-uuid:
+              description: A UUID of the request matching internal application logs useful for audit or debugging reasons.
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/ReferenceCodeResponses"
+        '500':
+          description: Internal Server Error
+          headers:
+            x-uuid:
+              description: A UUID of the request matching internal application logs useful for audit or debugging reasons.
+              schema:
+                type: string
+                format: uuid
+    post:
+      summary: Generate new reference code.
+      operationId: generateReferenceCode
+      tags:
+        - Reference Management
+      requestBody:
+        description: Reference code generation request meta-data.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReferenceCodeRequest'
+      responses:
+        '200':
+          description: Reference code created and contact point notified.
+          headers:
+            x-uuid:
+              description: A UUID of the request matching internal application logs useful for audit or debugging reasons.
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/ReferenceCodeResponse"
+        '400':
+          description: Request contains invalid data, see error response body for details.
+          headers:
+            x-uuid:
+              description: A UUID of the request matching internal application logs useful for audit or debugging reasons.
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/Errors"
+        '500':
+          description: Internal Server Error
+          headers:
+            x-uuid:
+              description: A UUID of the request matching internal application logs useful for audit or debugging reasons.
+              schema:
+                type: string
+                format: uuid
+  /application/{id}:
+    get:
+      summary: Get registered application by ID.
+      operationId: getRegisteredApplicationById
+      tags:
+        - Admin
+      parameters:
+        - name: id
+          in: path
+          description: Application ID.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Applications.
+          headers:
+            x-uuid:
+              description: A UUID of the request matching internal application logs useful for audit or debugging reasons.
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/Application"
+        '404':
+          description: Application ID unknown / not found.
+          headers:
+            x-uuid:
+              description: A UUID of the request matching internal application logs useful for audit or debugging reasons.
+              schema:
+                type: string
+                format: uuid
+        '500':
+          description: Internal Server Error
+          headers:
+            x-uuid:
+              description: A UUID of the request matching internal application logs useful for audit or debugging reasons.
+              schema:
+                type: string
+                format: uuid
+    put:
+      summary: Update a registered application by ID
+      operationId: updateRegisteredApplicationById
+      tags:
+        - Admin
+      parameters:
+        - name: id
+          in: path
+          description: Application ID.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Updated application. Note that application name must be unique. ID field must match field in path. ID field cannot be null.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Application'
+      responses:
+        '200':
+          description: Updated application.
+          headers:
+            x-uuid:
+              description: A UUID of the request matching internal application logs useful for audit or debugging reasons.
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/Application"
+        '400':
+          description: Request contains invalid data, see error response body for details.
+          headers:
+            x-uuid:
+              description: A UUID of the request matching internal application logs useful for audit or debugging reasons.
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/Errors"
+        '404':
+          description: Application ID unknown / not found.
+          headers:
+            x-uuid:
+              description: A UUID of the request matching internal application logs useful for audit or debugging reasons.
+              schema:
+                type: string
+                format: uuid
+        '409':
+          description: An application with the same name already exists.
+          headers:
+            x-uuid:
+              description: A UUID of the request matching internal application logs useful for audit or debugging reasons.
+              schema:
+                type: string
+                format: uuid
+        '500':
+          description: Internal Server Error
+          headers:
+            x-uuid:
+              description: A UUID of the request matching internal application logs useful for audit or debugging reasons.
+              schema:
+                type: string
+                format: uuid
+  /application:
+    get:
+      summary: Get all registered applications.
+      operationId: getRegisteredApplications
+      tags:
+        - Admin
+      responses:
+        '200':
+          description: List of Applications.
+          headers:
+            x-uuid:
+              description: A UUID of the request matching internal application logs useful for audit or debugging reasons.
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/Applications"
+        '500':
+          description: Internal Server Error
+          headers:
+            x-uuid:
+              description: A UUID of the request matching internal application logs useful for audit or debugging reasons.
+              schema:
+                type: string
+                format: uuid
+    post:
+      summary: Create a new application
+      operationId: createApplication
+      tags:
+        - Admin
+      requestBody:
+        description: Application to create. Note that application name must be unique.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Application'
+      responses:
+        '200':
+          description: Created application.
+          headers:
+            x-uuid:
+              description: A UUID of the request matching internal application logs useful for audit or debugging reasons.
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/Application"
+        '400':
+          description: Request contains invalid data, see error response body for details.
+          headers:
+            x-uuid:
+              description: A UUID of the request matching internal application logs useful for audit or debugging reasons.
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/Errors"
+        '409':
+          description: An application with the same name already exists.
+          headers:
+            x-uuid:
+              description: A UUID of the request matching internal application logs useful for audit or debugging reasons.
+              schema:
+                type: string
+                format: uuid
+        '500':
+          description: Internal Server Error
+          headers:
+            x-uuid:
+              description: A UUID of the request matching internal application logs useful for audit or debugging reasons.
+              schema:
+                type: string
+                format: uuid
+      callbacks:
+        onData:
+          '{$request.body.callbackEndpoint}':
+            post:
+              description: Callback is sent whenever a reference has been validated. This feature is enabled based on settings in this request, as well as the frequency settings.
+              requestBody:
+                description: The latest reference code.
+                content:
+                  application/json:    
+                    schema:
+                      $ref: "#/components/schemas/ReferenceCodeResponse"
+              responses:
+                '202':
+                  description: HTTP Only - Accepted.
+                '500':
+                  description: HTTP Only - System failure. Event will not be re-sent.
+components:
+  schemas:
+    ReferenceCode:
+      required:
+        - createdOn
+        - firstValidatedOn
+        - validationCount
+        - expireOn
+      properties:
+        createdOn:
+          type: string
+          format: date-time
+          description: Timestamp when reference code was created.
+        firstValidatedOn:
+          type: string
+          format: date-time
+          description: Timestamp when reference code was first validated on.
+        validationCount:
+          type: integer
+          format: int32
+          description: Count of times reference code was validated.
+        expireOn:
+          type: string
+          format: date-time
+          description: Timestamp after which reference code will expire and gets deleted.
+    ReferenceCodeRequest:
+      required:
+        - contactType
+        - contactDetails
+        - expireOn
+        - applicationId
+      properties:
+        contactType:
+          type: string
+          enum:
+            - EMAIL
+            - SMS
+          description: The contact point type.
+        contactDetails:
+          type: object
+          description: A generic object containing contact point details. Refer to the documentation of each contact type support for details on accepted definitions here.
+        expireOn:
+          type: string
+          format: date-time
+          description: Reference code expiry time, after which it is deleted.
+        applicationId:
+          type: integer
+          format: int32
+          description: Application ID creating this reference code.
+    ReferenceCodeResponse:
+      allOf:
+        - $ref: '#/components/schemas/ReferenceCodeRequest'
+        - $ref: '#/components/schemas/ReferenceCode'
+        - type: object
+      required:
+        - internalReference
+      properties:
+        internalReference:
+          type: string
+          format: uuid
+          description: A unique ID to be used by the creating application for linking purposes as well as polling for results.
+    Error:
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          description: A system friendly error code.
+        message:
+          type: string
+          description: A human friendly error message.
+    Errors: 
+      type: array
+      items:
+        $ref: "#/components/schemas/Error"
+    Application:
+      required:
+        - name
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Unique application ID.
+        name:
+          type: string
+          description: Name of application.
+        callbackFrequencyType:
+          type: string
+          description: Whether to receive all validation attempts or only the first one. If null, system default is used. Applies only if callbackEndpoint is defined.
+          enum:
+            - ALL
+            - FIRST
+        callbackEndpoint:
+          type: string
+          format: url
+          description: Callback URL to receive validation attempts notifications. Leave null to disable.
+    Applications:
+      type: array
+      items:
+        $ref: "#/components/schemas/Application"
+    ReferenceCodeResponses:
+      type: array
+      items:
+        $ref: "#/components/schemas/ReferenceCodeResponse"
